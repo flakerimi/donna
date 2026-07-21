@@ -1,0 +1,39 @@
+#!/bin/sh
+# woulduse — harness exec plugin giving Donna live stats from woulduse.app.
+case "$1" in
+  spec)
+    cat <<'JSON'
+{
+  "name": "woulduse",
+  "description": "Live numbers from woulduse.app — Flak's startup-validation community.",
+  "tools": [
+    {
+      "name": "stats",
+      "description": "Fetch the current woulduse.app leaderboard: every startup with its votes, feedback count and would-use percentage, plus totals. Use for launch metrics, the morning brief, or whenever Flak asks how woulduse is doing. Compare against remembered numbers to spot movement."
+    }
+  ]
+}
+JSON
+    ;;
+  run)
+    if [ "$2" = "stats" ]; then
+      cat >/dev/null
+      json=$(curl -fsS --max-time 15 https://woulduse.app/api/startups) || { echo "woulduse.app unreachable" >&2; exit 1; }
+      printf '%s' "$json" | jq -r '
+        "woulduse.app — \(length) startups · \(map(.votes) | add // 0) votes · \(map(.feedbackCount // 0) | add // 0) feedback total\n"
+        + (sort_by(-.votes) | map(
+            "- \(.name) (@\(.makerName)): \(.votes) votes, \(.feedbackCount // 0) feedback"
+            + (if .wouldUsePct != null then ", \(.wouldUsePct)% would use" else "" end)
+          ) | join("\n"))'
+    else
+      echo "unknown tool: $2" >&2
+      exit 1
+    fi
+    ;;
+  deliver)
+    echo "no deliver kinds" >&2; exit 1
+    ;;
+  *)
+    echo "usage: woulduse spec|run stats" >&2; exit 2
+    ;;
+esac

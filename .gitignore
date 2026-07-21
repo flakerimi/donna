@@ -1,0 +1,5 @@
+# Secrets — live locally / in Basepod env only, never in git
+.api-token
+google-web-client.json
+.env*
+*.p8

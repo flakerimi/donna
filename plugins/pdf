@@ -1,0 +1,39 @@
+#!/bin/sh
+# pdf — harness exec plugin: extract text from PDFs in the workspace
+# (e.g. email attachments saved by gmail_get_attachment).
+case "$1" in
+  spec)
+    cat <<'JSON'
+{
+  "name": "pdf",
+  "description": "Read PDF files from the workspace (poppler pdftotext).",
+  "tools": [
+    {
+      "name": "extract_text",
+      "description": "Extract the text of a PDF in your workspace — e.g. an email attachment saved to attachments/report.pdf. Pass the workspace-relative path.",
+      "input_schema": {
+        "type": "object",
+        "properties": { "path": { "type": "string", "description": "Workspace-relative path to the PDF." } },
+        "required": ["path"]
+      }
+    }
+  ]
+}
+JSON
+    ;;
+  run)
+    if [ "$2" = "extract_text" ]; then
+      path=$(jq -r '.path // empty')
+      case "$path" in
+        ""|*..*) echo "invalid path" >&2; exit 1 ;;
+      esac
+      base="${HARNESS_WORKSPACE:-$HARNESS_ROOT}"
+      file="$base/$path"
+      [ -f "$file" ] || { echo "no such file: $path" >&2; exit 1; }
+      pdftotext -layout "$file" - | head -c 80000
+    else
+      echo "unknown tool: $2" >&2; exit 1
+    fi
+    ;;
+  *) echo "usage: pdf spec|run extract_text" >&2; exit 2 ;;
+esac

@@ -1,0 +1,9 @@
+name: donna
+server: bp.common.al
+domain: donna.common.al
+port: 8080
+volumes:
+    - donna-data:/data
+build:
+    dockerfile: Dockerfile
+    context: .
