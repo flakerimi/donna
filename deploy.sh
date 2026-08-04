@@ -1,8 +1,17 @@
 #!/bin/sh
 # Deploy Donna. Basepod wipes an app's stored env on deploy, so this script
 # always re-applies env from ~/Harnes/.env + .api-token and restarts.
+#
+#   --seed-auth   also ship ~/Harnes/auth.json (from `harness login` on this
+#                 Mac) as a first-boot Claude OAuth seed. The entrypoint only
+#                 writes it when no credential file exists on /data yet.
 set -e
 cd "$(dirname "$0")"
+
+SEED_AUTH_B64=""
+if [ "${1:-}" = "--seed-auth" ]; then
+  SEED_AUTH_B64="$(base64 -i "$HOME/Harnes/auth.json" | tr -d '\n')"
+fi
 
 bp deploy
 
@@ -43,6 +52,7 @@ bp env set donna \
   INBOX_DELIVER=app:personal \
   PROVIDER=kimi \
   HARNESS_FALLBACK_PROVIDERS="fireworks,mistral,openrouter" \
+  ${SEED_AUTH_B64:+HARNESS_AUTH_SEED_B64="$SEED_AUTH_B64"} \
   TZ=Europe/Tirane >/dev/null
 
 bp restart donna

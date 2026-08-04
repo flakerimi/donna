@@ -7,6 +7,16 @@ set -e
 PROVIDER="${PROVIDER:-deepseek}"
 OWNER="${OWNER_NAME:-the user}"
 
+# Claude OAuth seed (deploy.sh --seed-auth): first boot only — an existing
+# file means the app connected (or tokens rotated) and must not be clobbered.
+CLAUDE_AUTH="${XDG_CONFIG_HOME:-/data}/harness/profiles/personal/auth.json"
+if [ -n "$HARNESS_AUTH_SEED_B64" ] && [ ! -f "$CLAUDE_AUTH" ]; then
+  mkdir -p "$(dirname "$CLAUDE_AUTH")"
+  echo "$HARNESS_AUTH_SEED_B64" | base64 -d > "$CLAUDE_AUTH"
+  chmod 600 "$CLAUDE_AUTH"
+  echo "seeded claude oauth credentials into $CLAUDE_AUTH"
+fi
+
 # Heartbeat: the pulse command is idempotent (stable id), so reinstall on
 # every boot to pick up PULSE_* changes.
 if [ -n "$PULSE_DELIVER" ]; then
