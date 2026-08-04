@@ -2,3 +2,9 @@
 *.md
 !profiles/*.md
 !skills/**/*.md
+# Secrets must never reach an image layer — they live on /data or Basepod env.
+auth.json
+.api-token
+google-web-client.json
+.env*
+*.p8

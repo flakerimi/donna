@@ -3,3 +3,4 @@
 google-web-client.json
 .env*
 *.p8
+auth.json
