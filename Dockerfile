@@ -4,7 +4,7 @@
 
 FROM golang:1.26-alpine AS build
 RUN apk add --no-cache git
-ARG HARNESS_VERSION=v0.19.2
+ARG HARNESS_VERSION=v0.20.0
 RUN GOBIN=/out go install github.com/flakerimi/harness/cmd/harness@${HARNESS_VERSION}
 
 FROM alpine:3.22
