@@ -7,14 +7,25 @@ set -e
 PROVIDER="${PROVIDER:-deepseek}"
 OWNER="${OWNER_NAME:-the user}"
 
-# Claude OAuth seed (deploy.sh --seed-auth): first boot only — an existing
-# file means the app connected (or tokens rotated) and must not be clobbered.
+# Claude OAuth seed (deploy.sh --seed-auth): add the claude credentials into
+# the profile's auth file without disturbing other connected providers (Google
+# lives in the same file). Only fills claude when it's absent — a rotated or
+# app-connected token is never clobbered.
 CLAUDE_AUTH="${XDG_CONFIG_HOME:-/data}/harness/profiles/personal/auth.json"
-if [ -n "$HARNESS_AUTH_SEED_B64" ] && [ ! -f "$CLAUDE_AUTH" ]; then
+if [ -n "$HARNESS_AUTH_SEED_B64" ]; then
   mkdir -p "$(dirname "$CLAUDE_AUTH")"
-  echo "$HARNESS_AUTH_SEED_B64" | base64 -d > "$CLAUDE_AUTH"
-  chmod 600 "$CLAUDE_AUTH"
-  echo "seeded claude oauth credentials into $CLAUDE_AUTH"
+  echo "$HARNESS_AUTH_SEED_B64" | base64 -d > /tmp/seed-auth.json
+  if [ ! -f "$CLAUDE_AUTH" ]; then
+    cp /tmp/seed-auth.json "$CLAUDE_AUTH"
+    chmod 600 "$CLAUDE_AUTH"
+    echo "seeded claude oauth into $CLAUDE_AUTH"
+  elif ! jq -e '.claude' "$CLAUDE_AUTH" >/dev/null 2>&1; then
+    # Shallow-merge: add claude, keep every other provider already connected.
+    jq -s '.[0] * .[1]' "$CLAUDE_AUTH" /tmp/seed-auth.json > "$CLAUDE_AUTH.new" \
+      && mv "$CLAUDE_AUTH.new" "$CLAUDE_AUTH" && chmod 600 "$CLAUDE_AUTH" \
+      && echo "merged claude oauth into $CLAUDE_AUTH"
+  fi
+  rm -f /tmp/seed-auth.json
 fi
 
 # Heartbeat: the pulse command is idempotent (stable id), so reinstall on
