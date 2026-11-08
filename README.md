@@ -12,6 +12,17 @@ engine's HTTP and SSE API. Scheduled work (a morning briefing, a periodic
 pulse, a nightly reflection) is delivered to the app's inbox with a push
 notification.
 
+## Why Donna
+
+She is named after Donna Paulsen from the TV series *Suits*: the assistant who
+runs the firm from the desk outside the office, knows what is coming before
+anyone asks, and answers "how did you know?" with "I'm Donna. I know
+everything." That is the brief for this one too. The persona is written to be
+three steps ahead: notice what is durable about the person and remember it
+unprompted, surface the thing he is about to need, flag the conflict before it
+happens, and prep before being asked. An assistant like that is judged by what
+never becomes a problem. The name is a nod, not an affiliation.
+
 ## What she does
 
 The persona in `profiles/personal.md` sets the tone: lead with the answer,
