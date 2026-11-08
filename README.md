@@ -21,7 +21,11 @@ everything." That is the brief for this one too. The persona is written to be
 three steps ahead: notice what is durable about the person and remember it
 unprompted, surface the thing he is about to need, flag the conflict before it
 happens, and prep before being asked. An assistant like that is judged by what
-never becomes a problem. The name is a nod, not an affiliation.
+never becomes a problem.
+
+This is a fan project, a tribute to a beloved character. It is not affiliated
+with the show, its studio or its cast, and the app's icon is a still of the
+character. If a rights holder asks for the name or the icon to go, it goes.
 
 ## What she does
 
